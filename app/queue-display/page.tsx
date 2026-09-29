@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Hospital, Volume2, VolumeX, Tv, Bell, Sparkles } from 'lucide-react';
 import { playHospitalChime } from '@/lib/audio/chime';
+import { PriorityBadge } from '@/components/ui/PriorityBadge';
 
 export default function QueueDisplayPage() {
   const [time, setTime] = useState('');
@@ -23,12 +24,12 @@ export default function QueueDisplayPage() {
   };
 
   const queueTableData = [
-    { tokenNo: 'A023', dept: 'General Medicine', status: 'NOW SERVING' as const, highlight: true },
-    { tokenNo: 'A022', dept: 'General Medicine', status: 'COMPLETED' as const, highlight: false },
-    { tokenNo: 'A021', dept: 'General Medicine', status: 'COMPLETED' as const, highlight: false },
-    { tokenNo: 'B104', dept: 'Cardiology', status: 'NOW SERVING' as const, highlight: true },
-    { tokenNo: 'B103', dept: 'ENT', status: 'WAITING' as const, highlight: false },
-    { tokenNo: 'C078', dept: 'Dermatology', status: 'WAITING' as const, highlight: false },
+    { tokenNo: 'EMG-001', dept: 'General Medicine', status: 'NOW SERVING' as const, priority: 'EMERGENCY' as const, highlight: true },
+    { tokenNo: 'A023', dept: 'General Medicine', status: 'WAITING' as const, priority: 'NORMAL' as const, highlight: false },
+    { tokenNo: 'A022', dept: 'General Medicine', status: 'COMPLETED' as const, priority: 'NORMAL' as const, highlight: false },
+    { tokenNo: 'B104', dept: 'Cardiology', status: 'NOW SERVING' as const, priority: 'NORMAL' as const, highlight: true },
+    { tokenNo: 'B103', dept: 'ENT', status: 'WAITING' as const, priority: 'PRIORITY' as const, highlight: false },
+    { tokenNo: 'C078', dept: 'Dermatology', status: 'WAITING' as const, priority: 'NORMAL' as const, highlight: false },
   ];
 
   return (
@@ -56,9 +57,8 @@ export default function QueueDisplayPage() {
               setSoundOn(nextState);
               if (nextState) playHospitalChime();
             }}
-            className={`px-4 py-2.5 rounded-2xl font-black text-xs flex items-center gap-2 transition-all border cursor-pointer ${
-              soundOn ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'
-            }`}
+            className={`px-4 py-2.5 rounded-2xl font-black text-xs flex items-center gap-2 transition-all border cursor-pointer ${soundOn ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'
+              }`}
           >
             {soundOn ? <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" /> : <VolumeX className="w-4 h-4" />}
             {soundOn ? 'Audio Chime ON' : 'Muted'}
@@ -123,6 +123,7 @@ export default function QueueDisplayPage() {
                   <tr className="border-b border-slate-800 text-slate-400 uppercase font-extrabold text-xs tracking-wider">
                     <th className="py-3.5 px-4">Token No.</th>
                     <th className="py-3.5 px-4">Department</th>
+                    <th className="py-3.5 px-4">Priority</th>
                     <th className="py-3.5 px-4 text-right">Status</th>
                   </tr>
                 </thead>
@@ -138,15 +139,17 @@ export default function QueueDisplayPage() {
                       <td className="py-4 px-4 text-base sm:text-lg font-extrabold text-white">
                         {row.dept}
                       </td>
+                      <td className="py-4 px-4">
+                        <PriorityBadge priority={row.priority} />
+                      </td>
                       <td className="py-4 px-4 text-right">
                         <span
-                          className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-black inline-block tracking-wider ${
-                            row.status === 'NOW SERVING'
-                              ? 'bg-emerald-500 text-slate-950 shadow-md animate-pulse'
-                              : row.status === 'COMPLETED'
+                          className={`px-4 py-1.5 rounded-xl text-xs sm:text-sm font-black inline-block tracking-wider ${row.status === 'NOW SERVING'
+                            ? 'bg-emerald-500 text-slate-950 shadow-md animate-pulse'
+                            : row.status === 'COMPLETED'
                               ? 'bg-slate-800 text-slate-400 border border-slate-700'
                               : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                          }`}
+                            }`}
                         >
                           {row.status}
                         </span>

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { PortalSidebar } from '@/components/layout/PortalSidebar';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { PriorityBadge } from '@/components/ui/PriorityBadge';
+import { TokenPriority } from '@/types/queue';
 import { playHospitalChime } from '@/lib/audio/chime';
 import { Volume2, RefreshCw, Bell, Stethoscope, CheckCircle2, Clock, Users, ArrowRight } from 'lucide-react';
 
@@ -16,12 +18,13 @@ export default function PatientLiveQueuePage() {
   }, []);
 
   const queueList = [
-    { token: 'A019', dept: 'General Medicine', status: 'COMPLETED' as const, isYou: false },
-    { token: 'A020', dept: 'General Medicine', status: 'COMPLETED' as const, isYou: false },
-    { token: 'A021', dept: 'General Medicine', status: 'CALLED' as const, isYou: false, nowServing: true },
-    { token: 'A022', dept: 'General Medicine', status: 'WAITING' as const, isYou: false },
-    { token: 'A023', dept: 'General Medicine', status: 'WAITING' as const, isYou: true },
-    { token: 'A024', dept: 'General Medicine', status: 'WAITING' as const, isYou: false },
+    { token: 'A019', dept: 'General Medicine', status: 'COMPLETED' as const, priority: 'NORMAL' as TokenPriority, isYou: false },
+    { token: 'A020', dept: 'General Medicine', status: 'COMPLETED' as const, priority: 'NORMAL' as TokenPriority, isYou: false },
+    { token: 'EMG-001', dept: 'General Medicine', status: 'CALLED' as const, priority: 'EMERGENCY' as TokenPriority, isYou: false, nowServing: true },
+    { token: 'A021', dept: 'General Medicine', status: 'WAITING' as const, priority: 'NORMAL' as TokenPriority, isYou: false },
+    { token: 'A022', dept: 'General Medicine', status: 'WAITING' as const, priority: 'NORMAL' as TokenPriority, isYou: false },
+    { token: 'A023', dept: 'General Medicine', status: 'WAITING' as const, priority: 'NORMAL' as TokenPriority, isYou: true },
+    { token: 'A024', dept: 'General Medicine', status: 'WAITING' as const, priority: 'NORMAL' as TokenPriority, isYou: false },
   ];
 
   return (
@@ -44,9 +47,8 @@ export default function PatientLiveQueuePage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 transition-all border cursor-pointer ${
-                audioEnabled ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-500 border-slate-200'
-              }`}
+              className={`px-3.5 py-2 rounded-2xl text-xs font-extrabold flex items-center gap-1.5 transition-all border cursor-pointer ${audioEnabled ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-500 border-slate-200'
+                }`}
             >
               <Volume2 className={`w-4 h-4 ${audioEnabled ? 'text-blue-600 animate-pulse' : 'text-slate-400'}`} />
               {audioEnabled ? 'Audio Alert ON' : 'Muted'}
@@ -134,23 +136,21 @@ export default function PatientLiveQueuePage() {
               {queueList.map((item) => (
                 <div
                   key={item.token}
-                  className={`p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${
-                    item.isYou
-                      ? 'bg-blue-50/80 border-blue-600 shadow-md ring-2 ring-blue-200'
-                      : item.nowServing
+                  className={`p-4 rounded-2xl border-2 flex items-center justify-between transition-all ${item.isYou
+                    ? 'bg-blue-50/80 border-blue-600 shadow-md ring-2 ring-blue-200'
+                    : item.nowServing
                       ? 'bg-cyan-50/70 border-cyan-500'
                       : 'bg-white border-slate-200/80'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-black font-mono text-sm ${
-                        item.isYou
-                          ? 'bg-blue-600 text-white'
-                          : item.nowServing
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-black font-mono text-sm ${item.isYou
+                        ? 'bg-blue-600 text-white'
+                        : item.nowServing
                           ? 'bg-cyan-500 text-white'
                           : 'bg-slate-100 text-slate-700'
-                      }`}
+                        }`}
                     >
                       {item.token}
                     </div>
@@ -173,7 +173,10 @@ export default function PatientLiveQueuePage() {
                     </div>
                   </div>
 
-                  <StatusBadge status={item.nowServing ? 'CALLED' : item.status} />
+                  <div className="flex items-center gap-2">
+                    <PriorityBadge priority={item.priority} />
+                    <StatusBadge status={item.nowServing ? 'CALLED' : item.status} />
+                  </div>
                 </div>
               ))}
             </div>
